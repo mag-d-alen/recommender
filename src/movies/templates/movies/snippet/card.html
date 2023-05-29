@@ -1,0 +1,28 @@
+
+<div class="card mb-4 box-shadow p-4">
+  <h3>{{movie.title}}</h3>
+  <div class="overflow-auto">{{movie.description}}</div>
+  <div class="card-body">
+    <p class="card-text">{{movie.overview}}</p>
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="btn-group">
+        <button type="button" class="btn btn-sm btn-outline-secondary">
+          <a href="{{movie.get_absolute_url}}"> View</a>
+        </button>
+      </div>
+      <div>
+        <select class="form-control">
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+        </select>
+        {% if movie.rating_count is not None %}
+        <small class="text-muted"
+          >{{movie.rating_avg}} ({{movie.rating_count}})</small
+        >
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

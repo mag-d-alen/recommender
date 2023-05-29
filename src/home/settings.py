@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+from decouple import config
+from traitlets import default
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
@@ -21,10 +22,10 @@ DATA_DIR = BASE_DIR / "data"
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+lhg%(e1rvib&$@_8f5=%%6nus#iowfse+2@yf*u4e&bom$tz-'
+SECRET_KEY = config('SECRET_KEY', default = None)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DJANGO_DEBUG', default=0, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -38,11 +39,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    #internal
     'user_profiles',
     'movies',
     'ratings',
+    #external
+    'django_celery_results',
+    'django_celery_beat', 
+    'allauth', 
+    'allauth.account',
+    'allauth.socialaccount'
 ]
-
+    
+SITE_ID =1
+KOGINT_URL = '/accounts/login'
+LOGIN_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_VERIFICATION= None #true for transactional emails.
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -56,10 +70,18 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'home.urls'
 
+CELERTY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+CELERY_BROKER_URL= config("CELERY_BROKER_REDIS_URL", default='redis://localhost:6379')
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_IMPORTS = (
+    'movies.tasks',
+    'ratings.tasks',
+)
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/ "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,3 +148,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
