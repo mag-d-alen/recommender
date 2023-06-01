@@ -1,5 +1,6 @@
 from datetime import datetime
 import zoneinfo
+from django import apps
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType 
@@ -7,6 +8,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models.query import QuerySet
 from django.db.models import Avg
 from django.db.models.signals import post_save
+
 
 # Create your models here.
 
@@ -21,12 +23,13 @@ class RatingChoice(models.IntegerChoices):
     FIVE = 5
     __empty__ = "Rate the film"
     
-
-
 class RatingQuerySet(models.QuerySet):
     def avg(self):
         return self.aggregate(average=Avg("value")) ["average"] #creates a dict {"avarage": value}
     
+    def movies(self):
+        ctype = ContentType.objects.get_for_model(apps.get_model('movies', 'Movie')) #to avoid circular import
+        return self.filter(active=True, content_type = ctype)
 
 class RatingManager(models.Manager):
     def get_queryset(self):

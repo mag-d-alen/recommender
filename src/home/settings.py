@@ -49,7 +49,9 @@ INSTALLED_APPS = [
     'django_celery_beat', 
     'allauth', 
     'allauth.account',
-    'allauth.socialaccount'
+    'allauth.socialaccount',
+    'django_extensions',
+    'django_htmx'
 ]
     
 SITE_ID =1
@@ -66,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
 ]
 
 ROOT_URLCONF = 'home.urls'
@@ -78,6 +81,12 @@ CELERY_IMPORTS = (
     'ratings.tasks',
 )
 
+NOTEBOOK_ARGUMENTS = [
+    '--ip', '0.0.0.0',
+    '--port', '8888',
+]
+IPYTHON_KERNEL_DISPLAY_NAME = 'Django Kernel'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -89,7 +98,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'ratings.context_processors.rating_choices'
             ],
+            'libraries':{
+            'get_dict_val_tag': 'ratings.template_tags.get_dict_val_tag',
+            
+            }
         },
     },
 ]

@@ -4,7 +4,7 @@ from celery import Celery
 
 
 # Set the default Django settings module for the 'celery' program.
-'''to start on windows- two venv terminals: 
+'''to start on windows- two venv terminals in src: 
     celery -A home worker -l info -P gevent
     celery -A home beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     start redis server 
@@ -34,11 +34,12 @@ app.conf.beat_schedule = {
     "run_movie_rating_avg_every_3_min": {
         "task" : 'task_calculate_movie_ratings',
         "schedule":60*30,
-        "kwargs":{"all":False, "count":None}
+        "kwargs":{}
+
     }, 
     "generate_fake_reviews_every_min":
         {   "task" : "generate_fake_reviews", 
             "schedule":60*30,
-            "kwargs":{"count":10000, "users":1000, "show_total":True}
+            "kwargs":{"count":10000, "users":1000}
         }
 }

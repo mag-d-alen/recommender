@@ -2,9 +2,10 @@ import zoneinfo
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db.models.query import QuerySet
+from django.forms import FloatField
 from ratings.models import Rating, rating_post_save
 import datetime as dt
-from django.db.models import Q
+from django.db.models import Q, F, Sum
 # Create your models here.
 
 
@@ -13,6 +14,12 @@ ISRAEL_TIMEZONE = zoneinfo.ZoneInfo('Asia/Jerusalem')
 
 
 class MovieQuerySet (models.QuerySet):
+    
+    def popular(self): 
+        return self.annotate(score=Sum(
+            F('rating_avg')*F('rating_count')), 
+            output_fiels = models.FloatField).order_by('score')
+        
     def needs_updating(self):
         now = dt.datetime.now().astimezone(ISRAEL_TIMEZONE)
         update_delta = now - dt.timedelta(days = RATING_UPDATE_DAYS)

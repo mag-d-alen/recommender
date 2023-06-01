@@ -1,6 +1,7 @@
-
+{% load get_dict_val_tag %}
 <div class="card mb-4 box-shadow p-4">
   <h3>{{movie.title}}</h3>
+  {% with my_ratings|get_dict_val_tag:movie.id as my_rating %}
   <div class="overflow-auto">{{movie.description}}</div>
   <div class="card-body">
     <p class="card-text">{{movie.overview}}</p>
@@ -12,10 +13,11 @@
       </div>
       <div>
         <select class="form-control">
-          <option>1</option>
-          <option>2</option>
-          <option>3</option>
-          <option>4</option>
+          {% for choice in rating_choices %} {% if choice is None %}
+          <option value="my_rating" selected>Choose score</option>
+          {% else %}
+          <option {% if my_rating == choice %} selected {% endif %}value="option">{{choice}}</option>
+          {% endif %} {% endfor %}
         </select>
         {% if movie.rating_count is not None %}
         <small class="text-muted"
@@ -25,4 +27,6 @@
       </div>
     </div>
   </div>
+  {% endwith %}
 </div>
+ 

@@ -4,7 +4,9 @@ from django.contrib.auth import get_user_model
 from movies.models import Movie
 from .models import Rating, RatingChoice
 from celery import shared_task
-
+from django.db.models import Avg, Count
+from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
 User = get_user_model()
 
 @shared_task(name = 'generate_fake_reviews' )
@@ -26,4 +28,17 @@ def generate_fake_reviews(count=100, users=10, null_avg=False):
         new_ratings.append(rating_obj.id)
     return new_ratings
 
+@shared_task(name = 'task_update_movie_ratings')
+def task_update_movie_ratings(object_id = None):
+    ct = ContentType.objects.get_for_model(model=Movie) # this retrieves GeneralTypeKey relation
+    rating_qs = Rating.objects.filter(content_type = ct)
+    if object_id is not None:
+        rating_qs = rating_qs.filter(object_id = object_id)
+    agg_ratings = rating_qs.filter(content_type = ct).values('object_id')\
+        .annotate(average = Avg('value'), count = Count('object_id'))
+        # object_id is a part of ContentType model (CT stores values by object_id and pk)
+    
+    for rating in agg_ratings:
+        qs = Movie.objects.filter(id= rating['object_id'])
+        qs.update(rating_avg= rating['average'], rating_count=rating['count'], last_updated = timezone.now() )
         
