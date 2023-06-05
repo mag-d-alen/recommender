@@ -7,3 +7,4 @@ Faker
 python-decouple
 redis
 django-htmx
+

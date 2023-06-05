@@ -15,10 +15,13 @@ ISRAEL_TIMEZONE = zoneinfo.ZoneInfo('Asia/Jerusalem')
 
 class MovieQuerySet (models.QuerySet):
     
-    def popular(self): 
+    def popular(self, reverse=False): 
+        ordering = '-score'
+        if reverse:
+            ordering = 'score'
         return self.annotate(score=Sum(
             F('rating_avg')*F('rating_count')), 
-            output_fiels = models.FloatField).order_by('score')
+            output_fiels = models.FloatField).order_by('-score')
         
     def needs_updating(self):
         now = dt.datetime.now().astimezone(ISRAEL_TIMEZONE)

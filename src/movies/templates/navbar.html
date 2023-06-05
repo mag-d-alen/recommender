@@ -1,4 +1,3 @@
-
 {% load account %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="#">Movie Recommender</a>
@@ -17,9 +16,9 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="#">Home </a>
+        <a class="nav-link"class="btn light" href="/movies/">Home </a>
       </li>
-      <a class= "btn light" href = "/accounts/logout/">{% user_display user %}</a
+      <a class="btn light" href="/accounts/logout/">{% user_display user %}</a>
     </ul>
   </div>
 </nav>
