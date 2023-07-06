@@ -1,6 +1,9 @@
-{% extends 'base.html'%}
-{% block content %} 
-<div class="container mt-4">{% include 'movies/snippet/card.html' with movie=movie %}
+{% extends 'base.html'%} {% block content %}
+<div class="container">
+  <div id='target-list-change'></div>
+  <div class="row">
+    {% include 'movies/snippet/infinite.html' %}
+    </div>
+  </div>
+  {% endblock %}
 </div>
-
-{% endblock %}

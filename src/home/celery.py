@@ -9,6 +9,8 @@ from celery import Celery
     celery -A home beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     start redis server 
     and python manage.py runserver
+    to start jupiter :  python manage.py shell_plus --notebook   
+    
 '''
 
 
@@ -34,12 +36,14 @@ app.conf.beat_schedule = {
     "run_movie_rating_avg_every_3_min": {
         "task" : 'task_update_movie_ratings',
         "schedule":60*30,
-        "kwargs":{}
-
     }, 
-    "generate_fake_reviews_every_min":
-        {   "task" : "generate_fake_reviews", 
-            "schedule":60*30,
-            "kwargs":{"count":10000, "users":1000}
-        }
+    # "generate_fake_reviews_every_min":
+    #     {   "task" : "generate_fake_reviews", 
+    #         "schedule":60*30,
+    #         "kwargs":{"count":10000, "users":1000}
+    #     }
+      "run_export_rating_dataset_evey_hour": {
+        "task" : 'export_rating_dataset',
+        "schedule":60*60,
+    },
 }

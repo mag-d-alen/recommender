@@ -1,6 +1,8 @@
+from curses import def_prog_mode
 from datetime import datetime
 import zoneinfo
-from django import apps
+from django.utils import timezone
+from django.apps import apps
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType 
@@ -8,6 +10,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models.query import QuerySet
 from django.db.models import Avg
 from django.db.models.signals import post_save
+
+from suggestions.models import Suggestion
 
 
 # Create your models here.
@@ -45,7 +49,7 @@ class Rating(models.Model):
     object_id= models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id") 
     active = models.BooleanField(default=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(default=timezone.now)
     active_update_timestamp =  models.DateTimeField(auto_now_add=False, auto_now=False, null=True, blank=True)
     
     objects = RatingManager()  #this gives access to two functions: Rating.objects.avg() and Rating.objects.all().avg
@@ -55,11 +59,17 @@ class Rating(models.Model):
         
 def rating_post_save(sender, instance, created, *args, **kwargs):
         if created:
+            Suggestion=apps.get_model('suggestions', 'Suggestion')
             if instance.active:
                 qs = Rating.objects.filter(
-                    content_type= instance.content_type, user = instance.user, object_id = instance.object_id).exclude(
-                        active=True, id = instance.id)
+                    content_type= instance.content_type, user=instance.user, object_id=instance.object_id).exclude(
+                        active=True, id=instance.id)
                 if qs.exists():
-                    qs = qs.exclude(active_update_timestamp__isnull = False)
-                    qs.update(active = False, active_update_timestamp= datetime.now().astimezone(ISRAEL_TIMEZONE))
+                    qs = qs.exclude(active_update_timestamp__isnull=False)
+                    qs.update(active=False, active_update_timestamp=datetime.now().astimezone(ISRAEL_TIMEZONE))
+                suggestion_qs = Suggestion.objects.filter(
+                    content_type= instance.content_type, user=instance.user, object_id=instance.object_id, did_rate=False)
+                if suggestion_qs.exists():
+                    suggestion_qs.update(did_rate=True, did_rate_timestamp=datetime.now().astimezone(ISRAEL_TIMEZONE), rating=instance.value)
+                    
 post_save.connect(rating_post_save, sender=Rating)

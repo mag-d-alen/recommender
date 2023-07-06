@@ -13,8 +13,7 @@ SORTING_CHOICES = {
     "top rated":"-rating_avg", 
     "low rated":"rating_avg", 
     "recent":"-release_date", 
-    "old":"release_date", 
-    
+    "old":"release_date",    
 }
 
 
@@ -36,10 +35,10 @@ class MovieListView(generic.ListView):
                 return queryset.popular()
             elif sort == 'unpopular':
                 return queryset.popular(reverse = True)
-            queryset= queryset.order_by(sort)
-        return queryset.popular()
+            queryset = queryset.order_by(sort)
+        return queryset
 
-    
+  
     def get_context_data(self):    
         context = super().get_context_data()
         request = self.request
@@ -64,22 +63,56 @@ class MovieDetailView(generic.DetailView):
         user = request.user
         if user.is_authenticated:
             movie = context['movie']
-            movies_ids = [movie.id]         
+            movies_ids = [movie.id]    
+            print(movies_ids)     
             qs = user.rating_set.filter(object_id__in=movies_ids, active = True, content_type_id = 7)
             context["my_ratings"] = {f"{r.object_id}": r.value for r in qs}
+            context['hide_view']=True
+            context['skip'] = False
         return context
     
 class MovieInfiniteView(MovieDetailView):
+    context_object_name = 'movie'
     def get_object(self):
-        return Movie.objects.all().order_by('?').first()
+        user = self.user
+        exclude_ids=[]
+        if user.is_authenticated:
+            exclude_ids= [x.object_id for x in user.rating_set.filter(active=True)]
+        return Movie.objects.all().exclude(id__in=exclude_ids).order_by('?').first()
     
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['skip'] = True
+        return context
         
     def get_template_names(self) -> List[str]:
         if self.request.htmx:
             return ['movies/snippet/infinite.html']
         return ["movies/infinite_view.html"]
+           
     
+class MoviePolularView(MovieListView):
     
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['endless_path'] = '/movies/popular'
+        return context
     
+    def get_object(self):
+        user = self.request.user
+        exclude_ids=[]
+        if user.is_authenticated:
+            print(user.rating_set)
+            exclude_ids = [x.object_id for x in user.rating_set.filter(active=True)]
+        movie_id_options = Movie.objects.all.popular().exclude(id__in=exclude_ids).values_list('id', flat=True)[:250]
+        return Movie.objects.filter(id__in=movie_id_options).order_by('?').first()
+        return Movie.objects.all().order_by('?').first()
     
+    def get_template_names(self) -> List[str]:
+            if self.request.htmx:
+                return ['movies/snippet/infinite.html']
+            return ["movies/infinite_view.html"]
+          
+
+          
     

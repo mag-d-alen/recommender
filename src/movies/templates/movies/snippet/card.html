@@ -1,18 +1,26 @@
-*
-        {% endif %}
+{% load get_dict_val_tag %}
+<div class="card mb-4 box-shadow p-4">
+  <h3>{{movie.title}}</h3>
+  {% with my_ratings|get_dict_val_tag:movie.id as my_rating %}
+  <div class="overflow-auto">{{movie.description}}</div>
+  <div class="card-body">
+    <p class="card-text">{{movie.overview}}</p>
+    <div class="d-flex justify-content-between align-items-center">
+    <div class="btn-group">
+          {% if not hide_view %}
         <button type="button" class="btn btn-sm btn-outline-secondary">
           <a href="{{movie.get_absolute_url}}"> View</a>
         </button>
+        {% elif skip %}
+        <button hx-post="/rate/movie/" class = 'btn btn-outline-secondary'>Skip</button>
+      {% endif %}
       </div>
-      <div>
-        {% include 'ratings/snippet/rating_choices.html' with movie_id=movie.id my_rating=my_rating rating_choices=rating_choices %} 
-        {% if movie.rating_count is not None %}
-        <small class="text-muted"
-          >{{movie.rating_avg}} ({{movie.rating_count}})</small
-        >
+        {% include 'ratings/snippet/rating_choices.html' with movie_id=movie.id my_rating=my_rating  %} 
+        {% if movie.rating_avg is not None %}
+        <small class="text-muted">{{movie.rating_avg}} ({{movie.rating_count}})</small>
         {% endif %}
       </div>
     </div>
-  </div>
+  </div> 
   {% endwith %}
 </div>

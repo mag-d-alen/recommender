@@ -3,9 +3,10 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db.models.query import QuerySet
 from django.forms import FloatField
-from ratings.models import Rating, rating_post_save
 import datetime as dt
 from django.db.models import Q, F, Sum
+
+from ratings.models import Rating
 # Create your models here.
 
 
@@ -19,15 +20,14 @@ class MovieQuerySet (models.QuerySet):
         ordering = '-score'
         if reverse:
             ordering = 'score'
-        return self.annotate(score=Sum(
-            F('rating_avg')*F('rating_count')), 
-            output_fiels = models.FloatField).order_by('-score')
+        return self.annotate(score=Sum(F('rating_avg')*F('rating_count'), output_fields = models.FloatField)).order_by(ordering)
         
     def needs_updating(self):
         now = dt.datetime.now().astimezone(ISRAEL_TIMEZONE)
         update_delta = now - dt.timedelta(days = RATING_UPDATE_DAYS)
-        qs = Movie.objects.filter(Q(last_updated__isnull=True)|
+        return self.filter(Q(last_updated__isnull=True)|
                                   Q(last_updated__lte=update_delta))
+ 
         
 class MovieManager(models.Manager):
         def needs_updating(self):

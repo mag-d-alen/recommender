@@ -1,6 +1,6 @@
-{% extends 'base.html'%}
 {% block content %} 
-<div class="container mt-4">{% include 'movies/snippet/card.html' with movie=movie skip=True %}
-</div>
+<div hx-get="{% if endless_path %}{{ endless_path }}{% else %}/movies/infinite/{% endif %}"class="container mt-4" hx-trigger= 'skipped, rated from:body' hx-swap="outerHTML">
 
+{% include 'movies/snippet/card.html'%}
+</div>
 {% endblock %}

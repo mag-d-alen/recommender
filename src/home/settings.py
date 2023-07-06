@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'user_profiles',
     'movies',
     'ratings',
+    'suggestions',
+    'exports',
+    'machine_learning',
     #external
     'django_celery_results',
     'django_celery_beat', 
@@ -56,7 +59,7 @@ INSTALLED_APPS = [
     
 SITE_ID =1
 KOGINT_URL = '/accounts/login'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/movies'
 ACCOUNT_EMAIL_VERIFICATION= None #true for transactional emails.
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
 
@@ -162,4 +165,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+MEDIA_ROOT = BASE_DIR / 'local-cdn' / 'media'
 

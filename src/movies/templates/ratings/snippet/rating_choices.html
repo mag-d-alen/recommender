@@ -1,5 +1,5 @@
  <form hx-post = '/rate/movie/' hx-trigger = 'change' hx-target='find .success'>
-  <div class='success mb-1'></div>
+  <div class='success mb-1'>Rating updated</div>
     {% if movie_id %}
       <input type = 'hidden' value='{{movie_id}}' name='movie_id'/> 
     {% endif %}
@@ -8,6 +8,7 @@
             <option value="{{my_rating}}" selected>Choose score</option>
             {% else %}
             <option {% if my_rating == choice %} selected {% endif %} value="{{choice}}">{{choice}}</option>
-            {% endif %} {% endfor %}
+            {% endif %}
+            {% endfor %}
     </select>
 </form>
