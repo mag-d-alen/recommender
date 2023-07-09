@@ -60,6 +60,7 @@ INSTALLED_APPS = [
 SITE_ID =1
 KOGINT_URL = '/accounts/login'
 LOGIN_REDIRECT_URL = '/movies'
+LOGOUT_REDIRECT_URL = '/movies'
 ACCOUNT_EMAIL_VERIFICATION= None #true for transactional emails.
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
 

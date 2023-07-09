@@ -45,9 +45,9 @@ class MovieListView(generic.ListView):
         user = request.user
         context['sorting_choices'] = SORTING_CHOICES
         if user.is_authenticated:
-            movies_ids = [movie.id for movie in context['object_list']]         
+            movies_ids = [movie.id for movie in context['object_list']]    
             qs = user.rating_set.filter(object_id__in=movies_ids, active = True, content_type_id = 7)
-            context["my_ratings"] = {f"{r.object_id}": r.value for r in qs}
+            context["my_ratings"] = {f"{r.object_id}": r.value for r in qs}            
         return context
     
     
@@ -64,7 +64,6 @@ class MovieDetailView(generic.DetailView):
         if user.is_authenticated:
             movie = context['movie']
             movies_ids = [movie.id]    
-            print(movies_ids)     
             qs = user.rating_set.filter(object_id__in=movies_ids, active = True, content_type_id = 7)
             context["my_ratings"] = {f"{r.object_id}": r.value for r in qs}
             context['hide_view']=True
@@ -74,7 +73,7 @@ class MovieDetailView(generic.DetailView):
 class MovieInfiniteView(MovieDetailView):
     context_object_name = 'movie'
     def get_object(self):
-        user = self.user
+        user = self.request.user
         exclude_ids=[]
         if user.is_authenticated:
             exclude_ids= [x.object_id for x in user.rating_set.filter(active=True)]
@@ -96,23 +95,19 @@ class MoviePolularView(MovieListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['endless_path'] = '/movies/popular'
+
         return context
     
     def get_object(self):
+        context_object_name = 'movie'
         user = self.request.user
         exclude_ids=[]
         if user.is_authenticated:
-            print(user.rating_set)
             exclude_ids = [x.object_id for x in user.rating_set.filter(active=True)]
         movie_id_options = Movie.objects.all.popular().exclude(id__in=exclude_ids).values_list('id', flat=True)[:250]
         return Movie.objects.filter(id__in=movie_id_options).order_by('?').first()
-        return Movie.objects.all().order_by('?').first()
     
-    def get_template_names(self) -> List[str]:
-            if self.request.htmx:
-                return ['movies/snippet/infinite.html']
-            return ["movies/infinite_view.html"]
-          
+
 
           
     
