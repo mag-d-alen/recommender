@@ -67,7 +67,7 @@ class MovieDetailView(generic.DetailView):
             qs = user.rating_set.filter(object_id__in=movies_ids, active = True, content_type_id = 7)
             context["my_ratings"] = {f"{r.object_id}": r.value for r in qs}
             context['hide_view']=True
-            context['skip'] = False
+            # context['skip'] = False
         return context
     
 class MovieInfiniteView(MovieDetailView):
@@ -81,7 +81,6 @@ class MovieInfiniteView(MovieDetailView):
     
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['skip'] = True
         return context
         
     def get_template_names(self) -> List[str]:
@@ -90,12 +89,11 @@ class MovieInfiniteView(MovieDetailView):
         return ["movies/infinite_view.html"]
            
     
-class MoviePolularView(MovieListView):
+class MoviePolularView(MovieDetailView):
     
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['endless_path'] = '/movies/popular'
-
+        context['endless_path'] = '/movies/popular/'
         return context
     
     def get_object(self):
@@ -104,10 +102,7 @@ class MoviePolularView(MovieListView):
         exclude_ids=[]
         if user.is_authenticated:
             exclude_ids = [x.object_id for x in user.rating_set.filter(active=True)]
-        movie_id_options = Movie.objects.all.popular().exclude(id__in=exclude_ids).values_list('id', flat=True)[:250]
+        movie_id_options = Movie.objects.all().popular().exclude(id__in=exclude_ids).values_list('id', flat=True)[:250]
         return Movie.objects.filter(id__in=movie_id_options).order_by('?').first()
     
-
-
-          
     

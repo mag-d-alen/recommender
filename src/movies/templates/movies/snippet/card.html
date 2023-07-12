@@ -9,9 +9,9 @@
     <div class="btn-group">
           {% if not hide_view %}
         <button type="button" class="btn btn-sm btn-outline-secondary">
-          <a href="{{movie.get_absolute_url}}"> View</a>
+          <a href="{%if endless_path %} movies/{{movie.get_absolute_url}} {% else %}{{movie.get_absolute_url}}{% endif %}"> View</a>
         </button>
-        {% elif skip %}
+        {% else %}
         <button hx-post="/rate/movie/" class = 'btn btn-outline-secondary'>Skip</button>
       {% endif %}
       </div>
