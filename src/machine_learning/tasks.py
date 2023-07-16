@@ -16,12 +16,15 @@ def batch_users_prediction_task(user_ids = None, start_page=0, offset=50, max_pa
     model = load_model()
     Suggestion = apps.get_model('suggestions', 'Suggestion')
     c_type = ContentType.objects.get(model='movie')
+    
     if not user_ids:
         user_ids = get_recent_users()
+        
     end_page = start_page+offset
     movie_ids = Movie.objects.all().popular(reverse=True).values_list('id', flat=True)[start_page:end_page]
     recently_suggested =  Suggestion.objects.get_recently_suggested(movie_ids=movie_ids, user_ids=user_ids)
     suggestions=[]
+    
     for movie_id in movie_ids:
         users_done = recently_suggested.get(f'{movie_id}') or []        
         for u_id in user_ids:

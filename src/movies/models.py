@@ -4,7 +4,9 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db.models.query import QuerySet
 from django.forms import FloatField
 import datetime as dt
-from django.db.models import Q, F, Sum, Case, When 
+from django.db.models import Q, F, Sum, Case, When
+from django.db.models.signals import post_delete, post_save
+from movies.tasks import update_movie_position_embedding_idx 
 
 from ratings.models import Rating
 # Create your models here.
@@ -44,6 +46,7 @@ class MovieManager(models.Manager):
 
 class Movie(models.Model):
     id = models.BigAutoField(primary_key=True)
+    idx = models.IntegerField(blank=True, null=True, help_text='continuous position for ml')
     title = models.CharField(max_length=120, unique=True)
     overview= models.TextField()
     release_date = models.DateTimeField(blank=True, null=True, auto_now=False, auto_now_add=False)
@@ -89,3 +92,14 @@ class Movie(models.Model):
     
     def __str__(self):
         return f"{self.id}__{self.title}"
+
+
+def movie_post_save(instance, created, *args, **kwargs):
+    if created and instance.id:    
+        update_movie_position_embedding_idx()
+post_save.connect(movie_post_save, sender=Movie)
+
+
+def movie_post_delete(*args, **kwargs):
+    update_movie_position_embedding_idx()       
+post_delete.connect(movie_post_delete, sender=Movie)

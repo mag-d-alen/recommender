@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils import timezone

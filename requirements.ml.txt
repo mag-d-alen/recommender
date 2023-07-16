@@ -1,4 +1,5 @@
 jupyter
 django-extensions
-numpy
-pandas 
+numpy>=1.11.2
+pandas
+scikit_surprise

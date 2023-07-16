@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-from datetime import datetime
+from datetime import datetime, timedelta
 import zoneinfo
 from django.apps import apps
 from django.db import models
@@ -33,8 +33,8 @@ class SuggestionQuerySet(models.QuerySet):
 
 class SuggestionManager(models.Manager):
     def get_recently_suggested(self, movie_ids=[], user_ids=[], days_ago=7):
-        delta= datetime.timedelta(days=days_ago)
-        time_delta = timezone.now()-delta
+        delta= timedelta(days=days_ago)
+        time_delta = datetime.now()-delta
         data={}
         ctype=ContentType.objects.get(app_label='movies', model='movie')
         dataset=self.get_queryset().filter(content_type=ctype, object_id__in=movie_ids, user_id__in=user_ids,timestamp__gte=time_delta, active =True).values('object_id', 'user_id')

@@ -15,6 +15,7 @@ def dashboard_view(request):
     if suggestion_qs.exists():
         movie_ids = suggestion_qs.order_by('-value').values_list('object_id', flat=True)
         max_movie_count = 10
+        request.session['total-new-suggestions'] = suggestion_qs.count()
         qs = Movie.objects.order_by_id(movie_ids)
         context['movies'] = qs[:max_movie_count]
     else:

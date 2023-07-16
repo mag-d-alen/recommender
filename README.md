@@ -56,5 +56,9 @@ code .
    and python manage.py runserver
 
 7. to run jupyter : cd src //python manage.py shell_plus --notebook
+open from link in the terminal
+folder for the jupiter files  - nbs, kernel-django
+import os
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true" as the first cell
 8. to add new dependencies python -m pip install -r ../requirements.txt
  
